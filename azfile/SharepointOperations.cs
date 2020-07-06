@@ -24,26 +24,28 @@ namespace azfile
             byte[] dataArray;
             foreach (Folder f in fcol)
             {
-                Helper.SPClientContext.Load(f);
-                Helper.SPClientContext.Load(f.Files);
-                Helper.SPClientContext.ExecuteQuery();
-                FileCollection fileCol = f.Files;
-                foreach (Microsoft.SharePoint.Client.File file in fileCol)
+                if (f.Name == "myfolder")
                 {
-                    Helper.SPClientContext.Load(file);
+                    Helper.SPClientContext.Load(f);
+                    Helper.SPClientContext.Load(f.Files);
                     Helper.SPClientContext.ExecuteQuery();
-                    ClientResult<System.IO.Stream> data = file.OpenBinaryStream();
-                    Helper.SPClientContext.Load(file);
-                    Helper.SPClientContext.ExecuteQuery();
-
-                    using (System.IO.MemoryStream mStream = new System.IO.MemoryStream())
+                    FileCollection fileCol = f.Files;
+                    foreach (Microsoft.SharePoint.Client.File file in fileCol)
                     {
-                        if (data != null)
+                        Helper.SPClientContext.Load(file);
+                        Helper.SPClientContext.ExecuteQuery();
+                        ClientResult<System.IO.Stream> data = file.OpenBinaryStream();
+                        Helper.SPClientContext.Load(file);
+                        Helper.SPClientContext.ExecuteQuery();
+
+                        using (System.IO.MemoryStream mStream = new System.IO.MemoryStream())
                         {
-                            data.Value.CopyTo(mStream);
-                            dataArray = mStream.ToArray();
-                            string b64String = Convert.ToBase64String(dataArray);
-                            
+                            if (data != null)
+                            {
+                                data.Value.CopyTo(mStream);
+                                dataArray = mStream.ToArray();
+                                string b64String = Convert.ToBase64String(dataArray);
+
                                 FileShareOperations.UploadtoFileShare("myfiles", dataArray, file.Name);
                             }
                         }
@@ -52,7 +54,7 @@ namespace azfile
 
 
 
-
+                }
                 }
             }
 
